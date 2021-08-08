@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2021.2.616/styles/kendo.default-v2.min.css" />
+
+    <script src="https://kendo.cdn.telerik.com/2021.2.616/js/jquery.min.js"></script>
+
+    <script src="https://kendo.cdn.telerik.com/2021.2.616/js/kendo.all.min.js"></script>
+
+    <style>
+
+        .red {
+            background-color: red !important;
+        }
+
+        .hit {
+            background-color: indianred !important;
+        }
+
+        .missed {
+            background-color: aqua !important;
+        }
+
+        th {
+            background-color: white !important;
+            border-block-color: white !important;
+        }
+
+        .k-grid td, .k-grid th {
+            padding: 0 0;
+            border-style: solid;
+            border-color: inherit;
+            outline: 0;
+            font-weight: inherit;
+            text-align: inherit;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 40px !important;
+            height: 40px !important;
+            text-align: center !important;
+        }
+
+        #bscnt, #dscnt, #bscntPC, #dscntPC, #uhc, #umc, #chc, #cmc {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            width: 40px;
+        }
+
+        #grid{
+            float:left;
+        }
+        #fire {
+            float: left;
+        }
+
+        #grid td {
+            cursor: pointer;
+        }
+
+        #fire td {
+            cursor: pointer;
+        }
+
+        #life, #lifeCom {
+            font-size: 18px;
+            font-weight: bold;
+            width: 40px;
+        }
+    </style>
+
+</head>
+<body>
+   
+    <div id="main">
+         
+        <table>
+            <tr>
+                <td align="left" style="vertical-align: top;">
+                    <a href="https://www.youtube.com/watch?v=4gHJlYLomrs" target="_blank">Please visit to this link, where you can learn "how to Play battleship"</a>
+                    <div id="grid">
+
+                    </div>
+                    <h2 id="Msg"></h2>
+                </td>
+                <td align="left" style="vertical-align: top;">
+                    <a href="https://www.youtube.com/watch?v=4gHJlYLomrs" target="_blank">Please visit to this link, to read the document</a>
+                    <div id="fire">
+                    </div>
+                </td>
+                <td  align="left">
+                    <table class="k-grid" align="left"  style="min-width:150px;">
+                        <tr><td colspan="3"><h3>YOU</h3><hr /></td></tr>
+
+                        <tr>
+                            <td id="bsimg"><img width="60" src="bs.png" /> </td>
+                            <td id="bscnt">0</td>
+                        </tr>
+                        <tr>
+                            <td id="dsimg"><img width="60" src="ds.jpg" /> </td>
+                            <td id="dscnt">0</td>
+                        </tr>
+                        <tr>
+                            <td class="hit" id="uh"><span>HIT</span></td>
+                            <td id="uhc"><span>0</span></td>
+                        </tr>
+                        <tr>
+                            <td class="missed" id="um"><span>MIS</span></td>
+                            <td id="umc"><span>0</span></td>
+                        </tr>
+                        <tr>
+                            <td><h4>Life</h4></td>
+                            <td style="min-width:100px;"><h4 id="life">100%</h4></td>
+                        </tr>
+
+                        <tr><td colspan="3"><h3>COMPUTER</h3><hr /></td></tr>
+                        <tr>
+                            <td id="bsimgPC"><img width="60" src="bs.png" /> </td>
+                            <td id="bscntPC">0</td>
+                        </tr>
+                        <tr>
+                            <td id="dsimgPC"><img width="60" src="ds.jpg" /> </td>
+                            <td id="dscntPC">0</td>
+                        </tr>
+                        <tr>
+                            <td class="hit" id="ch"><span>HIT</span></td>
+                            <td id="chc"><span>0</span></td>
+                        </tr>
+                        <tr>
+                            <td class="missed" id="cm"><span>MIS</span></td>
+                            <td id="cmc"><span>0</span></td>
+                        </tr>
+                        <tr>
+                            <td><h4>Life</h4></td>
+                            <td style="min-width:100px;"><h4 id="lifeCom">100%</h4></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+ 
+        <script>
+
+            var p1 = window.location.href;
+            var p2 = p1.substring(p1.lastIndexOf(":"), p1.length);
+            var portNo = p2.substring(1, p2.indexOf("/"));
+       
+            var server = 'https://localhost:' + portNo+'/';
+
+            var ships = Array();//user's ships
+            var bord = Array(); //user's bord
+            var hits = Array(); //user's success
+            var loose = Array();//user's loose
+
+            var shipsCom = Array();//computer's ships
+            var bordCom = Array(); //computer's bord
+            var hitsCom = Array(); //computer's success
+            var looseCom = Array();//computer's loose
+
+            var Battleship = 0;
+            var Destroyers = 0;
+            var BattleshipCom = 0;
+            var DestroyersCom = 0;
+
+            var BordRow = function () {
+                this.ID = 0;
+                this.A = "";
+                this.B = "";
+                this.C = "";
+                this.D = "";
+                this.E = "";
+                this.F = "";
+                this.G = "";
+                this.H = "";
+                this.I = "";
+                this.J = "";
+
+                this.Set = function (obj) {
+                    this.ID = obj.RowID;
+                    this.A = obj.A.Code;
+                    this.B = obj.B.Code;
+                    this.C = obj.C.Code;
+                    this.D = obj.D.Code;
+                    this.E = obj.E.Code;
+                    this.F = obj.F.Code;
+                    this.G = obj.G.Code;
+                    this.H = obj.H.Code;
+                    this.I = obj.I.Code;
+                    this.J = obj.J.Code;
+                }
+            }
+            
+
+            $(document).ready(function () {
+
+                
+                var url = server+'Api/Game/InitializeInstance';
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    success: function (result) {
+                        
+                        for (var i = 0; i < result.UserGrid.length; i++) {
+                            var row = new BordRow();
+                            row.Set(result.UserGrid[i]);
+                            bord.push(row);
+                        }
+
+                        for (var i = 0; i < result.ComGrid.length; i++) {
+                            var row = new BordRow();
+                            row.Set(result.ComGrid[i]);
+                            bordCom.push(row);
+                        }
+                        
+                        for (var i = 0; i < result.ComShips.length; i++) {
+
+                            if (result.ComShips[i].ShipType == "B") {
+                                BattleshipCom = parseInt(BattleshipCom) + 1;
+                                var sp = result.ComShips[i].Columns;
+                                var s = Array();
+                                for (var j = 0; j < sp.length; j++) {
+                                    s.push(sp[j].Code);
+                                }
+                                shipsCom.push(s);
+                                
+                            } else {
+                                DestroyersCom = parseInt(DestroyersCom) + 1;
+                                var sp = result.ComShips[i].Columns;
+                                var s = Array();
+                                for (var j = 0; j < sp.length; j++) {
+                                    s.push(sp[j].Code);
+                                }
+                                shipsCom.push(s);
+                            } 
+                        }
+
+                        LoadGrid();
+                        FireGrid();
+                        $("#bscntPC").html("" + BattleshipCom);
+                        $("#dscntPC").html("" + DestroyersCom);
+                    }
+                });
+                 
+
+            });
+
+            var LoadGrid = function () {
+                $("#grid").kendoGrid({
+                    dataSource: {
+                        data: bord,
+                        schema: {
+                            model: {
+                                fields: {
+                                    ID: { type: "number" },
+                                    A: { type: "string" },
+                                    B: { type: "string" },
+                                    C: { type: "string" },
+                                    D: { type: "string" },
+                                    E: { type: "string" },
+                                    F: { type: "string" },
+                                    G: { type: "string" },
+                                    H: { type: "string" },
+                                    I: { type: "string" },
+                                    J: { type: "string" },
+                                }
+                            }
+                        },
+                        pageSize: 10
+                    },
+                    height: 475,
+                    width: 570,
+                    change: onChange,
+                    dataBound: onDataBound,
+                    selectable: "multiple cell",
+                    columns: [
+                        {
+                            field: "ID", title: " ", width: "50px", attributes: { style: "background-color: white" }
+                        },
+                        { field: "A", title: "A", width: "50px" },
+                        { field: "B", title: "B", width: "50px" },
+                        { field: "C", title: "C", width: "50px" },
+                        { field: "D", title: "D", width: "50px" },
+                        { field: "E", title: "E", width: "50px" },
+                        { field: "F", title: "F", width: "50px" },
+                        { field: "G", title: "G", width: "50px" },
+                        { field: "H", title: "H", width: "50px" },
+                        { field: "I", title: "I", width: "50px" },
+                        { field: "J", title: "J", width: "50px" },
+                    ]
+                });
+
+                //$("#grid").data("kendoGrid").dataSource.read();
+            }
+
+
+            var FireGrid = function () {
+                $("#fire").kendoGrid({
+                    dataSource: {
+                        data: bord,
+                        schema: {
+                            model: {
+                                fields: {
+                                    ID: { type: "number" },
+                                    A: { type: "string" },
+                                    B: { type: "string" },
+                                    C: { type: "string" },
+                                    D: { type: "string" },
+                                    E: { type: "string" },
+                                    F: { type: "string" },
+                                    G: { type: "string" },
+                                    H: { type: "string" },
+                                    I: { type: "string" },
+                                    J: { type: "string" },
+                                }
+                            }
+                        },
+                        pageSize: 10
+                    },
+                    height: 475,
+                    width: 570,
+                    change: onChangeFire,
+                    dataBound: onDataBoundFire,
+                    selectable: "multiple cell",
+                    columns: [
+                        {
+                            field: "ID", title: " ", width: "50px", attributes: { style: "background-color: white" }
+                        },
+                        { field: "A", title: "A", width: "50px" },
+                        { field: "B", title: "B", width: "50px" },
+                        { field: "C", title: "C", width: "50px" },
+                        { field: "D", title: "D", width: "50px" },
+                        { field: "E", title: "E", width: "50px" },
+                        { field: "F", title: "F", width: "50px" },
+                        { field: "G", title: "G", width: "50px" },
+                        { field: "H", title: "H", width: "50px" },
+                        { field: "I", title: "I", width: "50px" },
+                        { field: "J", title: "J", width: "50px" },
+                    ]
+                });
+            }
+             
+            //validate the selected ship
+            var IsValid = function (ship) {
+                var valid = false;
+                if (ship.length > 3 && ship.length < 6) {
+                    if (ship.length == 5) {
+                        if (Battleship == 0) {
+                            valid = true;
+                        } else {
+                            valid = false;
+                        }
+                    } else if (ship.length == 4) {
+                        if (Destroyers == 0 || Destroyers == 1) {
+                            valid = true;
+                        } else {
+                            valid = false;
+                        }
+                    } else {
+                        valid = false;
+                    }
+                }
+
+                if (valid) {
+                    if (ship.length == 5) {
+                        Battleship = 1;
+                        $("#bscnt").html("" + Battleship);
+                    } else {
+                        Destroyers++;
+                        $("#dscnt").html("" + Destroyers);
+                    }
+                }
+
+                return valid;
+            }
+
+            //Method to user grid selection event
+            function onChange(arg) {
+                SetText("Msg", "", "");
+                var selected = $.map(this.select(), function (item) {
+                    return $(item).text();
+                });
+                //
+                var ship = Array();
+                for (var i = 0; i < selected.length; i++) {
+                    ship.push(selected[i]);
+                }
+
+                if (IsValid(ship)) {
+                    ships.push(ship);
+                    LoadGrid();
+                }
+
+            }
+
+            //User grod on data bound event 
+            function onDataBound(arg) {
+
+                for (var i = 0; i < ships.length; i++) {
+                    var ship = ships[i];
+                    for (var j = 0; j < ship.length; j++) {
+                        var s = ship[j];
+                        var col = s.substring(0, 1);
+                        var ind = parseInt(s.substring(1));
+                        MakeShip(arg, col, ind, this);
+                    }
+                }
+
+                for (var i = 0; i < hitsCom.length; i++) {
+                    var s = hitsCom[i];
+                    var col = s.substring(0, 1);
+                    var ind = parseInt(s.substring(1));
+                    MarkShip(arg, col, ind, this);
+                }
+
+                for (var i = 0; i < looseCom.length; i++) {
+                    debugger;
+                    var s = looseCom[i];
+                    var col = s.substring(0, 1);
+                    var ind = parseInt(s.substring(1));
+                    MarkMissed(arg, col, ind, this);
+                }
+
+            }
+
+            //Create the ships on the bord and prevent overlap
+            var MakeShip = function (e, col, ind, arg) {
+                var columns = e.sender.columns;
+                var columnIndex = arg.wrapper.find(".k-grid-header [data-field=" + col + "]").index();
+                var rows = e.sender.tbody.children();
+                for (var j = 0; j < rows.length; j++) {
+                    var row = $(rows[j]);
+                    var dataItem = e.sender.dataItem(row);
+                    //
+                    var s = dataItem.get(col);
+
+                    var cin = parseInt(s.substring(1));
+
+                    if (cin == ind) {
+                        var cell = row.children().eq(columnIndex);
+                        cell.addClass("red k-group-cell");
+                    }
+                }
+            }
+
+            //Mark on the ship if it get hit
+            var MarkShip = function (e, col, ind, arg) {
+                var columns = e.sender.columns;
+                var columnIndex = arg.wrapper.find(".k-grid-header [data-field=" + col + "]").index();
+                var rows = e.sender.tbody.children();
+                for (var j = 0; j < rows.length; j++) {
+                    var row = $(rows[j]);
+                    var dataItem = e.sender.dataItem(row);
+                    //
+                    var s = dataItem.get(col);
+
+                    var cin = parseInt(s.substring(1));
+
+                    if (cin == ind) {
+                        var cell = row.children().eq(columnIndex);
+                        cell.addClass("hit k-group-cell");
+                    }
+                }
+            }
+
+            //Mark the missed shots
+            var MarkMissed = function (e, col, ind, arg) {
+                var columns = e.sender.columns;
+                var columnIndex = arg.wrapper.find(".k-grid-header [data-field=" + col + "]").index();
+                var rows = e.sender.tbody.children();
+                for (var j = 0; j < rows.length; j++) {
+                    var row = $(rows[j]);
+                    var dataItem = e.sender.dataItem(row);
+                    //
+                    var s = dataItem.get(col);
+
+                    var cin = parseInt(s.substring(1));
+
+                    if (cin == ind) {
+                        var cell = row.children().eq(columnIndex);
+                        cell.addClass("missed k-group-cell");
+                    }
+                }
+            }
+
+            //Attack bord of the User
+            function onDataBoundFire(arg) {
+                for (var i = 0; i < hits.length; i++) {
+                    var s = hits[i];
+                    var col = s.substring(0, 1);
+                    var ind = parseInt(s.substring(1));
+                    MarkShip(arg, col, ind, this);
+                }
+
+                for (var i = 0; i < loose.length; i++) {
+                    var s = loose[i];
+                    var col = s.substring(0, 1);
+                    var ind = parseInt(s.substring(1));
+                    MarkMissed(arg, col, ind, this);
+                }
+            }
+
+            //calculate the Game life and select the winner.
+            function LifeCount() {
+
+                var tot = 5 + 8;
+                var hc = parseInt(hitsCom.length);
+                var life = Math.round(((parseInt(tot) - hc) / parseInt(tot)) * 100);
+                $("#life").text(life + "%");
+
+
+                var hcc = parseInt(hits.length);
+                var lifeCom = Math.round(((parseInt(tot) - hcc) / parseInt(tot)) * 100);
+                $("#lifeCom").text(lifeCom + "%");
+
+                if (parseInt(lifeCom) == 0) {
+                    SetText("Msg", "", "CONGRADULATIONS! YOU WON..");
+                }
+                else if (parseInt(life) == 0) {
+                    SetText("Msg", "I", "YOU LOST, TRY AGAIN..!");
+                }
+
+
+            }
+
+            //Fire on Computer's ships
+            function onChangeFire(arg) {
+                SetText("Msg", "", "");
+                if (Battleship == 1 && Destroyers == 2) {
+                    var selected = $.map(this.select(), function (item) {
+                        return $(item).text();
+                    });
+
+                    if (selected.length == 1) {
+
+                        var h = hits.findIndex(x => x === selected[0]);
+                        var l = loose.findIndex(x => x === selected[0]);
+
+                        if (h == -1 && l == -1) {
+                            var status = hit(selected[0]);
+
+                            if (status) {
+                                hits.push(selected[0]);
+                            } else {
+                                loose.push(selected[0]);
+                            }
+
+                            LoadGrid();
+                            FireGrid();
+                            MarkTable();
+                            MarkTableCom();
+                            LifeCount();
+                        }
+
+                        //Attack back to User's ship
+                        FireCom();
+                    } else {
+
+                    }
+                } else {
+                    SetText("Msg", "E", "Please Mark Your Ships First!");
+                }
+
+
+            }
+
+            var SetText = function (control, type, msg) {
+                $("#" + control).text(msg);
+                if (type == "E") {
+                    $("#" + control).css('color', 'red');
+                }
+                else if (type == "I") {
+                    $("#" + control).css('color', 'blue');
+                }
+                else {
+                    $("#" + control).css('color', 'green');
+                }
+            }
+
+
+
+            var shipModel = function () {
+                this.ShipType = "";
+                this.Columns = Array();
+                this.Set = function (arr) {
+
+                    if (!arr) {
+                    } else {
+                        for (var i = 0; i < arr.length; i++) {
+                            this.Columns.push({ ID: i, Index: this.Columns.length + i, Code: arr[i] });
+                        }
+                    }
+                }
+            }
+
+
+            /**
+             * create the request with current game information
+             * This will sende to Server
+             * */
+            var RequestObj = function () {
+                this.UserGrid = Array();
+                this.ComGrid = Array();
+                this.UserShips = Array();
+                this.ComShips = Array();
+                this.UserHit = Array();
+                this.UserMis = Array();
+                this.ComHit = Array();
+                this.ComMis = Array();
+                this.UserLife = 0;
+                this.ComLife = 0;
+
+                this.Set = function () {
+
+                    for (var i = 0; i < bord.length; i++) {
+                        this.UserGrid.push(
+                            {
+                                RowID: i,
+                                A: { Code: bord[i].A },
+                                B: { Code: bord[i].B },
+                                C: { Code: bord[i].C },
+                                D: { Code: bord[i].D },
+                                E: { Code: bord[i].F },
+                                G: { Code: bord[i].G },
+                                H: { Code: bord[i].H },
+                                I: { Code: bord[i].I },
+                                J: { Code: bord[i].J }
+                            });
+                    }
+                    for (var i = 0; i < bordCom.length; i++) {
+                        this.ComGrid.push(
+                            {
+                                RowID: i,
+                                A: { Code: bord[i].A },
+                                B: { Code: bord[i].B },
+                                C: { Code: bord[i].C },
+                                D: { Code: bord[i].D },
+                                E: { Code: bord[i].F },
+                                G: { Code: bord[i].G },
+                                H: { Code: bord[i].H },
+                                I: { Code: bord[i].I },
+                                J: { Code: bord[i].J }
+                            });
+                    }
+
+                    for (var i = 0; i < ships.length; i++) {
+                        var ship = ships[i];
+                        var type = ships[i].length == 5 ? "B" : "D";
+                        if (ships[i].length > 0) {
+                            var obj = new shipModel();
+                            obj.Set(ships[i]);
+                            this.UserShips.push(obj);
+                        }
+
+                    }
+                    for (var i = 0; i < shipsCom.length; i++) {
+                        var ship = shipsCom[i];
+                        var type = shipsCom[i].length == 5 ? "B" : "D";
+                        if (shipsCom.length > 0) {
+                            var obj = new shipModel();
+                            obj.Set(shipsCom[i]);
+                            this.ComShips.push(obj);
+                        }
+                    }
+                    for (var i = 0; i < hits.length; i++) {
+                        this.UserHit.push({ ID: i, Index: 0, Code: hits[i], IsHit: 1, IsMis: 0 });
+                    }
+                    for (var i = 0; i < hitsCom.length; i++) {
+                        this.ComHit.push({ ID: i, Index: 0, Code: hitsCom[i], IsHit: 1, IsMis: 0 });
+                    }
+                    for (var i = 0; i < loose.length; i++) {
+                        this.UserMis.push({ ID: i, Index: 0, Code: loose[i], IsHit: 0, IsMis: 1 });
+                    }
+                    for (var i = 0; i < looseCom.length; i++) {
+                        this.ComMis.push({ ID: i, Index: 0, Code: looseCom[i], IsHit: 0, IsMis: 1 });
+                    }
+                }
+            }
+
+            //Attack to User's ships with random shots from API
+            var FireCom = function () {
+                var req = new RequestObj();
+                req.Set();
+
+                $.ajax({
+                    type: "POST",
+                    url: server + "api/Game/FireOnUsersShip",
+                    data: JSON.stringify(req),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        var block = data.Code;
+
+                        if (!block) {
+                            SetText("Msg", "I", "Computer Missed a Chance!..");
+                        } else {
+                            //Fire on Users ships
+                            var status = hitCom(block);
+
+                            if (status) {
+                                hitsCom.push(block);
+                            } else {
+                                looseCom.push(block);
+                            }
+
+                            LoadGrid();
+                            MarkTable();
+                            MarkTableCom();
+                            LifeCount();
+                        }
+                    },
+                    error: function (err) {
+                        SetText("Msg", "E", err);
+                    }
+                });
+
+            }
+
+            //score bord User
+            var MarkTable = function () {
+                $("#uhc").html(hits.length);
+                $("#umc").html(loose.length);
+            }
+
+            //Score bord Computer
+            var MarkTableCom = function () {
+                $("#chc").html(hitsCom.length);
+                $("#cmc").html(looseCom.length);
+            }
+
+            //Proceed shoot
+            var hit = function (cell) {
+                var status = false;
+                for (var i = 0; i < shipsCom.length; i++) {
+                    var ship = shipsCom[i];
+                    for (var j = 0; j < ship.length; j++) {
+                        if (ship[j] == cell) {
+                            ship.splice(j, 1);
+                            status = true;
+                        }
+                    }
+                }
+                return status;
+            }
+
+            //parse the random cell by computer
+            var hitCom = function (cell) {
+                var status = false;
+                for (var i = 0; i < ships.length; i++) {
+                    var ship = ships[i];
+                    for (var j = 0; j < ship.length; j++) {
+                        if (ship[j] == cell) {
+                            ship.splice(j, 1);
+                            status = true;
+                        }
+                    }
+                }
+                return status;
+            }
+
+
+        </script>
+    </div>
+
+
+
+</body>
+</html>
