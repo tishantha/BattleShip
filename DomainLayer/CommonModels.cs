@@ -76,6 +76,7 @@ namespace DomainLayer
             string[] letters = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
              
             Ship s = new Ship();
+            s.ShipType = type;
             Random rnd = new Random();
               
             if (type == "B")
@@ -85,6 +86,7 @@ namespace DomainLayer
                 int letter = rnd.Next(6, 10);
 
                 s.ShipDir = "V";
+                
                 string let = letters[letter - 1];
                  
                 int start = 0;
