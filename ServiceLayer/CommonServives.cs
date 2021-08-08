@@ -56,7 +56,7 @@ namespace ServiceLayer
             }
             
             Random rnd = new Random();
-            int index = rnd.Next(1, sList.Count-1);
+            int index = sList.Count - 1==0?0:rnd.Next(1, sList.Count-1);
             Code = sList[index];
             return Code;
         }

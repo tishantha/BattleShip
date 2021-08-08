@@ -69,6 +69,90 @@ namespace DomainLayer
         public List<GridColumn> UserMis { get; set; }
         public List<GridColumn> ComMis { get; set; }
 
+        private Ship CreateRandomShip(string type, int iteration)
+        {
+
+    
+            string[] letters = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+             
+            Ship s = new Ship();
+            Random rnd = new Random();
+              
+            if (type == "B")
+            {
+                int index = rnd.Next(1, 10);
+
+                int letter = rnd.Next(6, 10);
+
+                s.ShipDir = "V";
+                string let = letters[letter - 1];
+                 
+                int start = 0;
+                if (index + (type == "B" ? 5 : 4) > 10)
+                {
+                    start = (index + (type == "B" ? 5 : 4)) - 10;
+                }
+                else
+                {
+                    start = index;
+                }
+
+                for(int i = start; i < start+ (type == "B" ? 5 : 4); i++)
+                {
+                    s.Columns.Add(new GridColumn() {Code=let+(i==10?""+i:"0"+i) });
+                }
+
+            }
+            else if (iteration==1)
+            {
+
+                int index = rnd.Next(1, 5);
+
+                int letter = rnd.Next(1, 5);
+
+                s.ShipDir = "H";
+                int start = 0;
+                if (letter + (type == "B" ? 5 : 4) > 5)
+                {
+                    start = (letter + (type == "B" ? 5 : 4)) - 5;
+                }
+                else
+                {
+                    start = letter;
+                }
+                for (int i = 0; i < (type == "B" ? 5 : 4); i++)
+                {
+                    s.Columns.Add(new GridColumn() { Code = letters[start-1+i] + (index == 10 ? "" + index : "0" + index) });
+                }
+ 
+            }
+
+            else if (iteration == 2)
+            {
+
+                int index = rnd.Next(6, 10);
+
+                int letter = rnd.Next(1, 5);
+
+                s.ShipDir = "H";
+                int start = 0;
+                if (letter + (type == "B" ? 5 : 4) > 5)
+                {
+                    start = (letter + (type == "B" ? 5 : 4)) - 5;
+                }
+                else
+                {
+                    start = letter;
+                }
+                for (int i = 0; i < (type == "B" ? 5 : 4); i++)
+                {
+                    s.Columns.Add(new GridColumn() { Code = letters[start - 1 + i] + (index == 10 ? "" + index : "0" + index) });
+                }
+
+            }
+            return s;
+        }
+
         public void SetDefault()
         {
             int k = 0;
@@ -101,31 +185,18 @@ namespace DomainLayer
                 ComGrid.Add(b);
             }
 
-            
-            Ship s1 = new Ship();
-            s1.ShipType = "B";
-            s1.Columns.Add(new GridColumn() { Code = "B03" });
-            s1.Columns.Add(new GridColumn() { Code = "C03" });
-            s1.Columns.Add(new GridColumn() { Code = "D03" });
-            s1.Columns.Add(new GridColumn() { Code = "E03" });
-            s1.Columns.Add(new GridColumn() { Code = "F03" });
+
+
+            Ship s1 = CreateRandomShip("B", 0);
             ComShips.Add(s1);
 
-            Ship s2 = new Ship();
-            s2.ShipType = "D";
-            s2.Columns.Add(new GridColumn() { Code = "G01" });
-            s2.Columns.Add(new GridColumn() { Code = "G02" });
-            s2.Columns.Add(new GridColumn() { Code = "G03" });
-            s2.Columns.Add(new GridColumn() { Code = "G04" });
+            Ship s2 = CreateRandomShip("D", 1);
             ComShips.Add(s2);
 
-            Ship s3 = new Ship();
-            s3.ShipType = "D";
-            s3.Columns.Add(new GridColumn() { Code = "B07" });
-            s3.Columns.Add(new GridColumn() { Code = "B08" });
-            s3.Columns.Add(new GridColumn() { Code = "B09" });
-            s3.Columns.Add(new GridColumn() { Code = "B10" });
+            Ship s3 = CreateRandomShip("D", 2);
             ComShips.Add(s3);
+
+            
 
         }
     }
@@ -137,6 +208,7 @@ namespace DomainLayer
             Columns = new List<GridColumn>();
         }
         public string ShipType { get; set; }
+        public string ShipDir { get; set; }
         public List<GridColumn> Columns { get; set; }
 
     }

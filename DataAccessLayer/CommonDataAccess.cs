@@ -11,8 +11,6 @@ namespace DataAccessLayer
 {
     public class CommonDataAccess
     {
-
-      
         public static bool SaveGame(Bord data , string type)
         {
             try
