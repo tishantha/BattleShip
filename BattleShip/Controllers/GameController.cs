@@ -51,7 +51,7 @@ namespace BattleShip.Controllers
         /// </summary>
         /// <param name="b"></param>
         /// <returns></returns>
-        [HttpPost]
+        //[HttpPost]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
         public GridColumn FireOnUsersShip(Bord b)
         {
