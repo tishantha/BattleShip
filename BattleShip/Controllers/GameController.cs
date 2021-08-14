@@ -1,12 +1,24 @@
 ﻿
 using DomainLayer;
+using Newtonsoft.Json;
 using ServiceLayer;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Web;
+using System.Web.Configuration;
 using System.Web.Http;
+using System.Web.Http.Cors;
+using System.Xml;
+
+
 
 namespace BattleShip.Controllers
 {
@@ -19,6 +31,9 @@ namespace BattleShip.Controllers
         /// (Future developments)
         /// </summary>
         /// <returns></returns>
+        /// 
+        //Install-Package Microsoft.AspNet.WebApi.Cors
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
         public Bord InitializeInstance()
         {
             CommonServives serObj = new CommonServives();
@@ -37,6 +52,7 @@ namespace BattleShip.Controllers
         /// <param name="b"></param>
         /// <returns></returns>
         [HttpPost]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
         public GridColumn FireOnUsersShip(Bord b)
         {
             GridColumn c = new GridColumn();
